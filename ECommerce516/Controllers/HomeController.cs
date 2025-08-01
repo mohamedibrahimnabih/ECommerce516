@@ -10,6 +10,7 @@ namespace ECommerce516.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private ApplicationDbContext _context = new();
 
     public HomeController(ILogger<HomeController> logger)
     {
@@ -18,7 +19,9 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        return View();
+        var products = _context.Products.Include(e => e.Category);
+
+        return View(products.ToList());
     }
 
     public IActionResult Privacy()
