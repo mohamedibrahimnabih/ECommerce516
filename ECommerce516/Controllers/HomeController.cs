@@ -18,40 +18,54 @@ public class HomeController : Controller
         _logger = logger;
     }
 
-    public IActionResult Index(string? Name, double? MinPrice, double? MaxPrice, int? CategoryId, bool isHot)
+    public IActionResult Index(FilterVM filterVM, int page = 1)
     {
         const int discount = 50;
         var products = _context.Products.Include(e => e.Category).AsQueryable();
 
         // Filter
-        if(Name is not null)
+        if(filterVM.Name is not null)
         {
-            products = products.Where(e => e.Name.Contains(Name));
-            ViewBag.ProductName = Name;
+            products = products.Where(e => e.Name.Contains(filterVM.Name));
+            ViewBag.ProductName = filterVM.Name;
         }
 
-        if(MinPrice is not null)
+        if(filterVM.MinPrice is not null)
         {
-            products = products.Where(e => e.Price - (e.Price * (e.Discount / 100)) >= MinPrice);
-            ViewBag.MinPrice = MinPrice;
+            products = products.Where(e => e.Price - (e.Price * (e.Discount / 100)) >= filterVM.MinPrice);
+            ViewBag.MinPrice = filterVM.MinPrice;
         }
 
-        if (CategoryId is not null)
+        if (filterVM.MaxPrice is not null)
         {
-            products = products.Where(e => e.CategoryId == CategoryId);
-            ViewBag.CategoryId = CategoryId;
+            products = products.Where(e => e.Price - (e.Price * (e.Discount / 100)) <= filterVM.MaxPrice);
+            ViewBag.MaxPrice = filterVM.MaxPrice;
         }
 
-        if (isHot)
+        if (filterVM.CategoryId is not null)
+        {
+            products = products.Where(e => e.CategoryId == filterVM.CategoryId);
+            ViewBag.CategoryId = filterVM.CategoryId;
+        }
+
+        if (filterVM.IsHot)
         {
             products = products.Where(e => e.Discount >= discount);
-            ViewBag.isHot = isHot;
+            ViewBag.isHot = filterVM.IsHot;
         }
 
         // Categories
         var categories = _context.Categories;
         ViewData["categories"] = categories.ToList();
         ViewBag.categories = categories.ToList();
+
+        // Paginitation
+        var totalNumberOfPages = Math.Ceiling(products.Count() / 8.0);
+        var currentPage = page;
+        ViewBag.totalNumberOfPages = totalNumberOfPages;
+        ViewBag.currentPage = currentPage;
+
+        products = products.Skip((page - 1) * 8).Take(8);
 
         return View(products.ToList());
     }

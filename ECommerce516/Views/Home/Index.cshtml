@@ -31,7 +31,7 @@
                             <input type="number" class="form-control" placeholder="Min Price" name="MinPrice" value="@ViewBag.MinPrice">
                         </div>
                         <div class="col-md-2">
-                            <input type="number" class="form-control" placeholder="Max Price" name="MaxPrice">
+                            <input type="number" class="form-control" placeholder="Max Price" name="MaxPrice" value="@ViewBag.MaxPrice">
                         </div>
 
                         <!-- Category -->
@@ -125,6 +125,8 @@
                             </div>
                         </div>
                     }
+
+
                 }
                 else
                 {
@@ -132,6 +134,37 @@
                         NO ITEMS!!
                     </div>
                 }
+            </div>
+
+            <div class="row">
+                <div class="col-12 d-flex justify-content-center">
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            @if (ViewBag.currentPage > 1)
+                            {
+                                <li class="page-item"><a class="page-link" href="/?page=@(ViewBag.currentPage-1)">Previous</a></li>
+                            }
+
+                            @for (var i = 1; i <= ViewBag.totalNumberOfPages; i++)
+                            {
+                                @if (i == ViewBag.currentPage)
+                                {
+                                    <li class="page-item active"><a class="page-link" href="/?Name=@ViewBag.ProductName&MinPrice=@ViewBag.MinPrice&MaxPrice=@ViewBag.MaxPrice&CategoryId=@ViewBag.CategoryId&IsHot=@ViewBag.IsHot&page=@i">@i</a></li>
+                                }
+                                else
+                                {
+                                    <li class="page-item"><a class="page-link" href="/?Name=@ViewBag.ProductName&MinPrice=@ViewBag.MinPrice&MaxPrice=@ViewBag.MaxPrice&CategoryId=@ViewBag.CategoryId&IsHot=@ViewBag.IsHot&page=@i">@i</a></li>
+                                }
+
+                            } 
+
+                            @if (ViewBag.currentPage != ViewBag.totalNumberOfPages && Model.Any())
+                            {
+                                <li class="page-item"><a class="page-link" href="/?page=@(ViewBag.currentPage+1)">Next</a></li>
+                            }
+                        </ul>
+                    </nav>
+                </div>
             </div>
         </div>
     </section>
