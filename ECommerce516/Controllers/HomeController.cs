@@ -18,9 +18,40 @@ public class HomeController : Controller
         _logger = logger;
     }
 
-    public IActionResult Index()
+    public IActionResult Index(string? Name, double? MinPrice, double? MaxPrice, int? CategoryId, bool isHot)
     {
-        var products = _context.Products.Include(e => e.Category);
+        const int discount = 50;
+        var products = _context.Products.Include(e => e.Category).AsQueryable();
+
+        // Filter
+        if(Name is not null)
+        {
+            products = products.Where(e => e.Name.Contains(Name));
+            ViewBag.ProductName = Name;
+        }
+
+        if(MinPrice is not null)
+        {
+            products = products.Where(e => e.Price - (e.Price * (e.Discount / 100)) >= MinPrice);
+            ViewBag.MinPrice = MinPrice;
+        }
+
+        if (CategoryId is not null)
+        {
+            products = products.Where(e => e.CategoryId == CategoryId);
+            ViewBag.CategoryId = CategoryId;
+        }
+
+        if (isHot)
+        {
+            products = products.Where(e => e.Discount >= discount);
+            ViewBag.isHot = isHot;
+        }
+
+        // Categories
+        var categories = _context.Categories;
+        ViewData["categories"] = categories.ToList();
+        ViewBag.categories = categories.ToList();
 
         return View(products.ToList());
     }
@@ -39,11 +70,16 @@ public class HomeController : Controller
 
         var topProducts = _context.Products.Include(e=>e.Category).Where(e=>e.Id != product.Id).OrderByDescending(e=>e.Traffic).Skip(0).Take(4);
 
+        var similarProducts = _context.Products.Include(e => e.Category).Where(e => e.Name.Contains(product.Name) && e.Id != product.Id).Skip(0).Take(4);
+
+        //var MinMaxPriceProducts = _context.Products.Include(e => e.Category).Where(e=>e.Price >= product.Price * 0.9 && e.Price <= product.Price * 1.1 && e.Id != product.Id).Skip(0).Take(4);
+
         return View(new ProductWithRelatedVM()
         {
             Product = product,
             RelatedProducts = relatedProducts.ToList(),
-            TopProducts = topProducts.ToList()
+            TopProducts = topProducts.ToList(),
+            SimilarProducts = similarProducts.ToList()
         });
 
     }
