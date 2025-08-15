@@ -10,6 +10,8 @@ namespace ECommerce516.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private ApplicationDbContext _context = new();
+
 
     public HomeController(ILogger<HomeController> logger)
     {
@@ -18,10 +20,40 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        return View();
+        var products = _context.Products.Include(e => e.Category);
+
+        return View(products.ToList());
+    }
+
+    public IActionResult Details(int id)
+    {
+        var product = _context.Products.Include(e=>e.Category).FirstOrDefault(e => e.Id == id);
+
+        if (product is null)
+            return RedirectToAction(nameof(NotFoundPage));
+
+        product.Traffic += 1;
+        _context.SaveChanges();
+
+        var relatedProducts = _context.Products.Include(e => e.Category).Where(e => e.CategoryId == product.CategoryId && e.Id != product.Id).Skip(0).Take(4);
+
+        var topProducts = _context.Products.Include(e=>e.Category).Where(e=>e.Id != product.Id).OrderByDescending(e=>e.Traffic).Skip(0).Take(4);
+
+        return View(new ProductWithRelatedVM()
+        {
+            Product = product,
+            RelatedProducts = relatedProducts.ToList(),
+            TopProducts = topProducts.ToList()
+        });
+
     }
 
     public IActionResult Privacy()
+    {
+        return View();
+    }
+
+    public IActionResult NotFoundPage()
     {
         return View();
     }
