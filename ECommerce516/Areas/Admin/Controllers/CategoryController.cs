@@ -1,16 +1,19 @@
 ﻿using ECommerce516.DataAccess;
+using ECommerce516.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace ECommerce516.Areas.Admin.Controllers
 {
     [Area(SD.AdminArea)]
     public class CategoryController : Controller
     {
-        private ApplicationDbContext _context = new();
+        //private ApplicationDbContext _context = new();
+        private CategoryRepository _categoryRepository = new();
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var categories = _context.Categories/*.OrderByDescending(e=>e.Status)*/;
+            var categories = await _categoryRepository.GetAsync();
 
             // Add Filters
 
@@ -24,15 +27,15 @@ namespace ECommerce516.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Category category)
+        public async Task<IActionResult> Create(Category category)
         {
             if(!ModelState.IsValid)
             {
                 return View(category);
             }
 
-            _context.Categories.Add(category);
-            _context.SaveChanges();
+            await _categoryRepository.CreateAsync(category);
+            await _categoryRepository.CommitAsync();
 
             TempData["success-notification"] = "Add Category Successfully";
 
@@ -40,9 +43,9 @@ namespace ECommerce516.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            var category = _context.Categories.FirstOrDefault(e => e.Id == id);
+            var category = await _categoryRepository.GetOneAsync(e => e.Id == id);
 
             if (category is null)
                 return RedirectToAction(SD.NotFoundPage, controllerName: SD.HomeController);
@@ -52,30 +55,30 @@ namespace ECommerce516.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(Category category)
+        public async Task<IActionResult> Edit(Category category)
         {
             if (!ModelState.IsValid)
             {
                 return View(category);
             }
 
-            _context.Categories.Update(category);
-            _context.SaveChanges();
+            _categoryRepository.Update(category);
+            await _categoryRepository.CommitAsync();
 
             TempData["success-notification"] = "Update Category Successfully";
 
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var category = _context.Categories.FirstOrDefault(e => e.Id == id);
+            var category = await _categoryRepository.GetOneAsync(e => e.Id == id);
 
             if (category is null)
                 return RedirectToAction(SD.NotFoundPage, controllerName: SD.HomeController);
 
-            _context.Categories.Remove(category);
-            _context.SaveChanges();
+            _categoryRepository.Delete(category);
+            await _categoryRepository.CommitAsync();
 
             TempData["success-notification"] = "Delete Category Successfully";
 
