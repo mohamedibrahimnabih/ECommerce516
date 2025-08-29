@@ -1,6 +1,7 @@
 ﻿using ECommerce516.DataAccess;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerce516.Areas.Admin.Controllers
@@ -21,7 +22,11 @@ namespace ECommerce516.Areas.Admin.Controllers
         public IActionResult Create()
         {
             var categories = _context.Categories;
-            var brands = _context.Brands;
+            var brands = _context.Brands.Select(e => new SelectListItem()
+            {
+                Value = e.Id.ToString(),
+                Text = e.Name
+            });
 
             return View(new CategoryWithBrandVM()
             {
@@ -67,7 +72,11 @@ namespace ECommerce516.Areas.Admin.Controllers
                 return NotFound();
 
             var categories = _context.Categories;
-            var brands = _context.Brands;
+            var brands = _context.Brands.Select(e => new SelectListItem()
+            {
+                Value = e.Id.ToString(),
+                Text = e.Name
+            });
 
             return View(new CategoryWithBrandVM()
             {

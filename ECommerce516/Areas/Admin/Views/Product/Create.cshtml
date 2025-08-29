@@ -53,12 +53,14 @@
                 <div class="mb-3">
                     <label for="BrandId" class="form-label">Brand Name</label>
                     @* <input type="number" class="form-control" id="BrandId" name="BrandId"> *@
-                    <select name="BrandId" class="form-select">
-                        @foreach (var item in Model.Brands)
-                        {
-                            <option value="@item.Id">@item.Name</option>
-                        }
-                    </select>
+                    @* <select name="BrandId" class="form-select"> *@
+                    @*     @foreach (var item in Model.Brands) *@
+                    @*     { *@
+                    @*         <option value="@item.Id">@item.Name</option> *@
+                    @*     } *@
+                    @* </select> *@
+
+                    <select class="form-select" asp-for="@Model.Product.BrandId" asp-items="@Model.Brands"></select>
                 </div>
                 <div class="mb-3">
                     <label for="status" class="form-label">Status</label>
