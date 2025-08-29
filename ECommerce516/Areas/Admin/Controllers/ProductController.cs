@@ -118,5 +118,24 @@ namespace ECommerce516.Areas.Admin.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        public IActionResult Delete(int id)
+        {
+            var product = _context.Products.FirstOrDefault(e => e.Id == id);
+
+            if (product is null)
+                return NotFound();
+
+            var oldFilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images", product.MainImg);
+            if (System.IO.File.Exists(oldFilePath))
+            {
+                System.IO.File.Delete(oldFilePath);
+            }
+
+            _context.Products.Remove(product);
+            _context.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
