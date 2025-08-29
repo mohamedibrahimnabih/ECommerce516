@@ -1,16 +1,19 @@
 ﻿using ECommerce516.DataAccess;
+using ECommerce516.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace ECommerce516.Areas.Admin.Controllers
 {
     [Area(SD.AdminArea)]
     public class BrandController : Controller
     {
-        private ApplicationDbContext _context = new();
+        //private ApplicationDbContext _context = new();
+        private Repository<Brand> _brandRepository = new();
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var brands = _context.Brands/*.OrderByDescending(e=>e.Status)*/;
+            var brands = await _brandRepository.GetAsync();
 
             // Add Filters
 
@@ -24,23 +27,25 @@ namespace ECommerce516.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Brand brand)
+        public async Task<IActionResult> Create(Brand brand)
         {
+            //ModelState.Remove("Products");
+
             if(!ModelState.IsValid)
             {
                 return View(brand);
             }
 
-            _context.Brands.Add(brand);
-            _context.SaveChanges();
+            await _brandRepository.CreateAsync(brand);
+            await _brandRepository.CommitAsync();
 
             return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            var brand = _context.Brands.FirstOrDefault(e => e.Id == id);
+            var brand = await _brandRepository.GetOneAsync(e => e.Id == id);
 
             if (brand is null)
                 return RedirectToAction(SD.NotFoundPage, controllerName: SD.HomeController);
@@ -50,28 +55,28 @@ namespace ECommerce516.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(Brand brand)
+        public async Task<IActionResult> Edit(Brand brand)
         {
             if (!ModelState.IsValid)
             {
                 return View(brand);
             }
 
-            _context.Brands.Update(brand);
-            _context.SaveChanges();
+            _brandRepository.Update(brand);
+            await _brandRepository.CommitAsync();
 
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var brand = _context.Brands.FirstOrDefault(e => e.Id == id);
+            var brand = await _brandRepository.GetOneAsync(e => e.Id == id);
 
             if (brand is null)
                 return RedirectToAction(SD.NotFoundPage, controllerName: SD.HomeController);
 
-            _context.Brands.Remove(brand);
-            _context.SaveChanges();
+            _brandRepository.Delete(brand);
+            await _brandRepository.CommitAsync();
             return RedirectToAction(nameof(Index));
         }
     }

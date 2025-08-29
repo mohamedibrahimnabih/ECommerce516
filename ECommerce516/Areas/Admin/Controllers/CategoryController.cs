@@ -9,7 +9,7 @@ namespace ECommerce516.Areas.Admin.Controllers
     public class CategoryController : Controller
     {
         //private ApplicationDbContext _context = new();
-        private CategoryRepository _categoryRepository = new();
+        private Repository<Category> _categoryRepository = new();
 
         public async Task<IActionResult> Index()
         {

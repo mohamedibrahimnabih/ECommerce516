@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
 
 namespace ECommerce516.Models
 {
@@ -11,6 +12,7 @@ namespace ECommerce516.Models
         public string Name { get; set; }
         public string? Description { get; set; }
         public bool Status { get; set; }
+        [ValidateNever]
         public List<Product> Products { get; set; }
     }
 }

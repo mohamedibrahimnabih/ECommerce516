@@ -3,26 +3,31 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace ECommerce516.Areas.Admin.Controllers
 {
     [Area(SD.AdminArea)]
     public class ProductController : Controller
     {
-        private ApplicationDbContext _context = new();
+        //private ApplicationDbContext _context = new();
 
-        public IActionResult Index()
+        private Repository<Product> _productRepository = new();
+        private Repository<Category> _categoryRepository = new();
+        private Repository<Brand> _brandRepository = new();
+
+        public async Task<IActionResult> Index()
         {
-            var products = _context.Products.Include(e => e.Category).Include(e => e.Brand);
+            var products = await _productRepository.GetAsync(includes: [e => e.Category, e => e.Brand]);
 
             return View(products.ToList());
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            var categories = _context.Categories;
-            var brands = _context.Brands.Select(e => new SelectListItem()
+            var categories = await _categoryRepository.GetAsync();
+            var brands = (await _brandRepository.GetAsync()).Select(e => new SelectListItem()
             {
                 Value = e.Id.ToString(),
                 Text = e.Name
@@ -36,7 +41,7 @@ namespace ECommerce516.Areas.Admin.Controllers
         }   
 
         [HttpPost]
-        public IActionResult Create(Product product, IFormFile MainImg)
+        public async Task<IActionResult> Create(Product product, IFormFile MainImg)
         {
             if (MainImg is null)
                 return BadRequest();
@@ -57,22 +62,22 @@ namespace ECommerce516.Areas.Admin.Controllers
                 product.MainImg = fileName;
             }
 
-            _context.Products.Add(product);
-            _context.SaveChanges();
+            await _productRepository.CreateAsync(product);
+            await _productRepository.CommitAsync();
 
             return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            var product = _context.Products.FirstOrDefault(e => e.Id == id);
+            var product = await _productRepository.GetOneAsync(e => e.Id == id);
 
             if (product is null)
                 return NotFound();
 
-            var categories = _context.Categories;
-            var brands = _context.Brands.Select(e => new SelectListItem()
+            var categories = await _categoryRepository.GetAsync();
+            var brands = (await _brandRepository.GetAsync()).Select(e => new SelectListItem()
             {
                 Value = e.Id.ToString(),
                 Text = e.Name
@@ -87,9 +92,9 @@ namespace ECommerce516.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(Product product, IFormFile? MainImg)
+        public async Task<IActionResult> Edit(Product product, IFormFile? MainImg)
         {
-            var productInDb = _context.Products.AsNoTracking().FirstOrDefault(e => e.Id == product.Id);
+            var productInDb = await _productRepository.GetOneAsync(e => e.Id == product.Id, tracked: false);
 
             if (productInDb is null)
                 return NotFound();
@@ -122,15 +127,15 @@ namespace ECommerce516.Areas.Admin.Controllers
                 product.MainImg = productInDb.MainImg;
             }
 
-            _context.Products.Update(product);
-            _context.SaveChanges();
+            _productRepository.Update(product);
+            await _productRepository.CommitAsync();
 
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var product = _context.Products.FirstOrDefault(e => e.Id == id);
+            var product = await _productRepository.GetOneAsync(e => e.Id == id);
 
             if (product is null)
                 return NotFound();
@@ -141,8 +146,8 @@ namespace ECommerce516.Areas.Admin.Controllers
                 System.IO.File.Delete(oldFilePath);
             }
 
-            _context.Products.Remove(product);
-            _context.SaveChanges();
+            _productRepository.Delete(product);
+            await _productRepository.CommitAsync();
 
             return RedirectToAction(nameof(Index));
         }
