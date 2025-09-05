@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using ECommerce516.ViewModels;
 
 namespace ECommerce516.DataAccess
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -14,6 +16,8 @@ namespace ECommerce516.DataAccess
         public DbSet<ProductSubImage> ProductSubImages { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Brand> Brands { get; set; }
+        public DbSet<UserOTP> UserOTPs { get; set; }
+        public DbSet<ECommerce516.ViewModels.NewPasswordVM> NewPasswordVM { get; set; } = default!;
 
         // Depracetd 
         //public ApplicationDbContext()

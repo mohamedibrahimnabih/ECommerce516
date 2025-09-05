@@ -4,3 +4,9 @@
         toastr.success('@TempData["success-notification"]')
     </script>
 }
+else if (TempData["error-notification"] is not null)
+{
+    <script>
+        toastr.error('@TempData["error-notification"]')
+    </script>
+}
