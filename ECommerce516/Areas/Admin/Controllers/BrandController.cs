@@ -8,8 +8,15 @@ namespace ECommerce516.Areas.Admin.Controllers
     [Area(SD.AdminArea)]
     public class BrandController : Controller
     {
+        private readonly IRepository<Brand> _brandRepository;
+
         //private ApplicationDbContext _context = new();
-        private Repository<Brand> _brandRepository = new();
+        //private Repository<Brand> _brandRepository = new();
+
+        public BrandController(IRepository<Brand> brandRepository)
+        {
+            _brandRepository = brandRepository;
+        }
 
         public async Task<IActionResult> Index()
         {

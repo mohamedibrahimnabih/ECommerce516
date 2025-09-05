@@ -2,3 +2,4 @@
 global using ECommerce516.ViewModels;
 global using ECommerce516.Utitlity;
 global using ECommerce516.Repositories;
+global using ECommerce516.Repositories.IRepositories;

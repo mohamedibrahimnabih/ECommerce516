@@ -8,6 +8,7 @@ namespace ECommerce516
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddScoped<IRepository<Category>, Repository<Category>>();
 
             var app = builder.Build();
 

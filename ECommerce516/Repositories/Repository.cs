@@ -1,11 +1,12 @@
 ﻿using ECommerce516.DataAccess;
+using ECommerce516.Repositories.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace ECommerce516.Repositories
 {
-    public class Repository<T> where T : class
+    public class Repository<T> : IRepository<T> where T : class
     {
 
         private ApplicationDbContext _context = new();

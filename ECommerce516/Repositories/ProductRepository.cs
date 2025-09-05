@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace ECommerce516.Repositories
 {
-    public class ProductRepository : Repository<Product>
+    public class ProductRepository : Repository<Product>, IProductRepository
     {
         private ApplicationDbContext _context = new();
 
