@@ -12,9 +12,16 @@ namespace ECommerce516.Areas.Admin.Controllers
     {
         //private ApplicationDbContext _context = new();
 
-        private Repository<Product> _productRepository = new();
-        private Repository<Category> _categoryRepository = new();
-        private Repository<Brand> _brandRepository = new();
+        private readonly IProductRepository _productRepository;
+        private readonly IRepository<Category> _categoryRepository;
+        private readonly IRepository<Brand> _brandRepository;
+
+        public ProductController(IProductRepository productRepository, IRepository<Category> categoryRepository, IRepository<Brand> brandRepository)
+        {
+            _productRepository = productRepository;
+            _categoryRepository = categoryRepository;
+            _brandRepository = brandRepository;
+        }
 
         public async Task<IActionResult> Index()
         {

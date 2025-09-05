@@ -1,3 +1,6 @@
+using ECommerce516.DataAccess;
+using Microsoft.EntityFrameworkCore;
+
 namespace ECommerce516
 {
     public class Program
@@ -8,7 +11,15 @@ namespace ECommerce516
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddDbContext<ApplicationDbContext>(option =>
+            {
+                option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+            });
+
             builder.Services.AddScoped<IRepository<Category>, Repository<Category>>();
+            builder.Services.AddScoped<IRepository<Brand>, Repository<Brand>>();
+            builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
             var app = builder.Build();
 
